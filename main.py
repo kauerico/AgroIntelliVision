@@ -49,7 +49,7 @@ def main():
     )
     
     # Salvar modelo
-    model.save('/content/drive/MyDrive/modelo_soja_prod')
+    model.save('./models/saved_models')
 
 if __name__ == "__main__":
     main()
