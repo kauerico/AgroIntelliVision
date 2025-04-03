@@ -1,5 +1,5 @@
 # Configurações globais, como caminho do dataset, tamanho do batch, tamanho da imagem, número de épocas e número de classes
-DATASET_PATH = "/content/drive/MyDrive/seu_caminho_para_dataset"
+DATASET_PATH = "C:\Users\katys\OneDrive\Desktop\PROJETO IC\codeTest\AgroIntelliVision\data\raw\DataSet"
 BATCH_SIZE = 64
 IMG_SIZE = (256, 256)
 EPOCHS = 40

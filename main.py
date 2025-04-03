@@ -11,7 +11,7 @@ def main():
         tf.keras.mixed_precision.set_global_policy('mixed_float16')
     
     # Pré-processamento de dados
-    train_ds = create_data_flow('training')
+    train_ds = create_data_flow('training') 
     val_ds = create_data_flow('validation')
     
     # Visualização de dados

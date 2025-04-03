@@ -177,3 +177,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+kat
+# Ignorar datasets
+data/raw/DataSet/
+data/raw/soja_dataset/
