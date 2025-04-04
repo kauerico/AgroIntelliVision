@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import tensorflow as tf
 from config.settings import EPOCHS
@@ -49,9 +50,22 @@ def main():
         initial_epoch=history.epoch[-1],
         callbacks=callbacks
     )
-    
-    # Salvar modelo
-    model.save('./models/saved_models')
+
+    # Diretório base onde os modelos serão salvos
+    base_path = './models/saved_models'
+
+    # Criar diretório base se não existir
+    os.makedirs(base_path, exist_ok=True)
+
+    # Pegar os números já usados nas pastas
+    existing = [int(name) for name in os.listdir(base_path) if name.isdigit()]
+    next_tag = max(existing) + 1 if existing else 1
+
+    # Caminho final para salvar
+    save_path = os.path.join(base_path, str(next_tag))
+    model.save(save_path)
+    print(f"Modelo salvo em: {save_path}")
+
 
 if __name__ == "__main__":
     main()
