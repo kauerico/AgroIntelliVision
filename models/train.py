@@ -14,9 +14,12 @@ def get_optimizer(steps_per_epoch):
     )
 
 def compile_model(model, optimizer):
+    if model is None:
+        raise ValueError("O modelo não pode ser None ao compilar")
+    
     model.compile(
         optimizer=optimizer,
-        loss='sparse_categorical_crossentropy',
+        loss='categorical_crossentropy',
         metrics=[
             'accuracy',
             keras.metrics.Precision(name='precision'),
@@ -24,4 +27,4 @@ def compile_model(model, optimizer):
             keras.metrics.AUC(name='auc')
         ]
     )
-    return model
+    return model  # Certifique-se de retornar o modelo

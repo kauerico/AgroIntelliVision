@@ -8,8 +8,9 @@ __pycache__/
 myenv
 
 
+# Ignorando DataSet
+/data/raw/DataSet
 
-/data/raw/teste/*
 
 # Distribution / packaging
 .Python

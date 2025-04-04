@@ -1,4 +1,6 @@
+import numpy as np
 import tensorflow as tf
+from config.settings import EPOCHS
 from data.preprocessing import create_data_flow
 from data.visualization import plot_class_distribution
 from models.build_model import build_model

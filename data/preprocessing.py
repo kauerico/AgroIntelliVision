@@ -1,6 +1,10 @@
 import tensorflow as tf
 from tensorflow import keras
 from config import settings
+from PIL import ImageFile
+
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True  # Adicione no início do seu arquivo
 
 def create_data_flow(subset):
     train_datagen = keras.preprocessing.image.ImageDataGenerator(
@@ -14,7 +18,6 @@ def create_data_flow(subset):
         zoom_range=0.3,
         horizontal_flip=True,
         vertical_flip=True,
-        channel_shift_range=0.2,
         fill_mode='reflect'
     )
     
@@ -23,7 +26,7 @@ def create_data_flow(subset):
         target_size=settings.IMG_SIZE,
         batch_size=settings.BATCH_SIZE,
         subset=subset,
-        class_mode='sparse',
+        class_mode='categorical',
         shuffle=True,
         seed=42
     )
