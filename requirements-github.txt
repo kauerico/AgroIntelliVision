@@ -1,0 +1,5 @@
+deepchecks[vision]
+tensorflow>=2.11
+torch
+torchvision
+Pillow
