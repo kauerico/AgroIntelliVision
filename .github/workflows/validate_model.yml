@@ -32,7 +32,7 @@ jobs:
         python models/test_models/main.py
 
     - name: Upload do relatório
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: validation-report
         path: validation_report.html
