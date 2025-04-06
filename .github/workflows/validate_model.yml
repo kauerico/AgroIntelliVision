@@ -1,9 +1,11 @@
 name: Validação Deepchecks
 
 on:
-  push:
-    paths:
-      - 'models/saved_models/**'
+    workflow_dispatch:
+    push:
+        paths:
+        - 'models/saved_models/**'
+      
 
 jobs:
   deepchecks:
