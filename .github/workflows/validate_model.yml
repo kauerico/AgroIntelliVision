@@ -1,0 +1,36 @@
+name: Validação Deepchecks
+
+on:
+  push:
+    paths:
+      - 'models/saved_models/**'
+
+jobs:
+  deepchecks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Instalar dependências
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+
+    - name: Rodar validação com Deepchecks
+      run: |
+        source venv/bin/activate
+        python models/test_models/main.py
+
+    - name: Upload do relatório
+      uses: actions/upload-artifact@v3
+      with:
+        name: validation-report
+        path: validation_report.html
