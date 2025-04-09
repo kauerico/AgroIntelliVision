@@ -1,7 +1,6 @@
 name: Validação Deepchecks
 
 on:
-  workflow_dispatch:
   push:
     paths:
       - 'models/saved_models/**'
