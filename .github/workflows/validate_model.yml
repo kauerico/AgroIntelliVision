@@ -11,22 +11,33 @@ jobs:
     - name: Checkout código
       uses: actions/checkout@v3
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
+    - name: Cache Docker layers
+      uses: actions/cache@v3
       with:
-        python-version: '3.11.9'
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-docker-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-docker-
 
-    - name: Instalar dependências
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build da imagem Docker com cache
       run: |
-        pip install --upgrade pip
-        pip install -r requirements-github.txt
+        docker build \
+          --cache-from=type=local,src=/tmp/.buildx-cache \
+          --cache-to=type=local,dest=/tmp/.buildx-cache \
+          -t deepchecks-validator dockerfile
 
-    - name: Rodar validação com Deepchecks
+    - name: Rodar validação com modelos e imagens montadas
       run: |
-        python models/test_models/main.py
-
+        docker run --rm \
+          -v ${{ github.workspace }}/models/saved_models:/models \
+          -v ${{ github.workspace }}/datasets/soja_images:/imagens \
+          deepchecks-validator
+          
     - name: Upload do relatório
-      uses: actions/upload-artifact@main
+      uses: actions/upload-artifact@v3
       with:
         name: validation-report
         path: validation_report.html
