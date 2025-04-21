@@ -4,7 +4,8 @@ on:
   push:
 
 jobs:
-  deepchecks:
+  deepchecks-validation:
+    name: Validação com Deepchecks
     runs-on: ubuntu-latest
 
     steps:
@@ -21,21 +22,35 @@ jobs:
 
     - name: Setup Docker Buildx
       uses: docker/setup-buildx-action@v2
+      with:
+        driver-opts: image=moby/buildkit:latest
+
+    - name: Criar e usar builder com suporte a cache
+      run: |
+        docker buildx create --name builder --driver docker-container --use
+        docker buildx inspect --bootstrap
 
     - name: Build da imagem Docker com cache
       run: |
-        docker build \
+        docker buildx build \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache \
-          -t deepchecks-validator dockerfile
+          --tag deepchecks-validator \
+          --load .
+
+    - name: Verificar diretórios montados
+      run: |
+        ls -la ${{ github.workspace }}/models/saved_models || echo "Diretório models/saved_models não encontrado"
+        ls -la ${{ github.workspace }}/datasets/soja_images || echo "Diretório datasets/soja_images não encontrado"
 
     - name: Rodar validação com modelos e imagens montadas
       run: |
         docker run --rm \
           -v ${{ github.workspace }}/models/saved_models:/models \
           -v ${{ github.workspace }}/datasets/soja_images:/imagens \
+          -v ${{ github.workspace }}:/workspace \
           deepchecks-validator
-          
+
     - name: Upload do relatório
       uses: actions/upload-artifact@v4
       with:
