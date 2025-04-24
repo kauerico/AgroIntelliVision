@@ -50,21 +50,12 @@ def predict():
         img = Image.open(io.BytesIO(request.files['image'].read()))
         img = img.convert('RGB')
         
-        # Redimensiona conforme o modelo espera (64x64 conforme o erro indicado)
-        img = img.resize((64, 64))
+        # Redimensiona conforme o modelo espera (256x256)
+        img = img.resize(settings.IMG_SIZE)
         
         # Converte para array e normaliza
         img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
-        
-        # Verificação de forma
-        print(f"Forma da imagem processada: {img_array.shape}")
-        print(f"Forma esperada pelo modelo: {model.input_shape}")
-        
-        if img_array.shape[1:] != model.input_shape[1:]:
-            return jsonify({
-                'error': f'Dimensões inválidas. Recebido: {img_array.shape[1:]}, Esperado: {model.input_shape[1:]}'
-            }), 400
         
         # Faz a predição
         predictions = model.predict(img_array)
@@ -77,13 +68,14 @@ def predict():
             'all_predictions': [
                 {'class': name, 'confidence': float(conf)}
                 for name, conf in zip(class_names, predictions[0])
-            ]
+            ],
+            'top3_predictions': sorted(
+                [{'class': name, 'confidence': float(conf)} 
+                 for name, conf in zip(class_names, predictions[0])],
+                key=lambda x: x['confidence'], reverse=True
+            )[:3]
         }
         
         return jsonify(response)
-        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
