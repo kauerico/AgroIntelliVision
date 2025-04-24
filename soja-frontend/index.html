@@ -1,174 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>AgroIntelliVision</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroIntelliVision | Diagnóstico Inteligente de Doenças da Soja</title>
+    <meta name="description" content="Solução avançada de diagnóstico de doenças da soja utilizando inteligência artificial">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    
+    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Global Styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(to right, #64b5f6, #81c784);
-            color: #fff;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: linear-gradient(90deg, #1e7e34, #388e3c);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.8rem;
-            color: #fff !important;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            height: 80vh;
-            background: url('https://www.shutterstock.com/search/green-soybean-field') no-repeat center center/cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #fff;
-        }
-        .hero-section h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            animation: fadeInUp 1s ease-out forwards;
-        }
-        .hero-section p {
-            font-size: 1.2rem;
-            margin-top: 1rem;
-            animation: fadeInUp 2s ease-out forwards;
-        }
-
-        /* Upload Section */
-        .upload-area {
-            background-color: #fff;
-            color: #4caf50;
-            padding: 40px;
-            border-radius: 1rem;
-            text-align: center;
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out;
-        }
-        .upload-area:hover {
-            transform: scale(1.05);
-        }
-        .upload-area input[type="file"] {
-            display: none;
-        }
-        .upload-area button {
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            background-color: #4caf50;
-            color: #fff;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .upload-area button:hover {
-            background-color: #388e3c;
-        }
-
-        /* Image Preview */
-        #imagePreview {
-            max-width: 90%;
-            margin-top: 20px;
-            border-radius: 1rem;
-            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Footer */
-        footer {
-            background: #388e3c;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-        footer p {
-            font-size: 1rem;
-        }
-
-        /* Modal */
-        .modal-content {
-            background: #388e3c;
-            color: #fff;
-            padding: 20px;
-            border-radius: 1rem;
-        }
-
-        /* Custom Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand animate__animated animate__fadeInLeft" href="#">🌱 AgroIntelliVision</a>
+            <a class="navbar-brand" href="#">
+                <span class="logo-icon">🌱</span>
+                <span>AgroIntelliVision</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">Como Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contato</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="hero-section">
-        <div>
-            <h1 class="animate__animated animate__fadeIn animate__delay-1s">Diagnóstico Inteligente de Doenças da Soja</h1>
-            <p class="animate__animated animate__fadeIn animate__delay-2s">Detecte doenças rapidamente usando IA. Faça upload da imagem da folha abaixo.</p>
+        <div class="hero-content fade-in-up">
+            <h1>Diagnóstico Avançado de Doenças da Soja</h1>
+            <p>Utilize inteligência artificial para identificar doenças em suas plantações com precisão e rapidez</p>
+            <a href="#upload" class="cta-button animate__animated animate__pulse animate__infinite">
+                <i class="bi bi-cloud-arrow-up"></i> Analisar Agora
+            </a>
         </div>
     </section>
 
-    <div class="container my-5">
-        <div id="uploadArea" class="upload-area text-center animate__animated animate__fadeIn">
-            <p class="lead">Arraste e solte uma imagem ou clique para selecionar</p>
-            <button id="uploadBtn">Selecionar Imagem</button>
-            <input type="file" id="fileInput" accept="image/*">
-        </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Upload Section -->
+            <section id="upload" class="mb-5 fade-in-up delay-1">
+                <h2 class="section-title">Diagnóstico por Imagem</h2>
+                <div class="upload-container">
+                    <div id="uploadArea" class="upload-area glass-card">
+                        <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
+                        <h3 class="upload-text">Envie uma foto da folha de soja</h3>
+                        <p class="upload-hint">Formatos suportados: JPG, PNG, JPEG (Até 5MB)</p>
+                        <button id="uploadBtn" class="upload-btn">
+                            <i class="bi bi-folder2-open"></i> Selecionar Imagem
+                        </button>
+                        <input type="file" id="fileInput" accept="image/*">
+                    </div>
 
-        <div id="previewContainer" class="text-center d-none mt-4">
-            <img id="imagePreview" class="img-fluid mb-3">
-            <div>
-                <button id="analyzeBtn" class="btn btn-success">Analisar</button>
-                <button id="resetBtn" class="btn btn-outline-light">Resetar</button>
-            </div>
-        </div>
+                    <!-- Preview Section -->
+                    <div id="previewContainer" class="preview-container d-none">
+                        <img id="imagePreview" class="img-fluid">
+                        <div class="action-buttons">
+                            <button id="analyzeBtn" class="btn-analyze">
+                                <i class="bi bi-magic"></i> Analisar Imagem
+                            </button>
+                            <button id="resetBtn" class="btn-reset">
+                                <i class="bi bi-arrow-counterclockwise"></i> Nova Imagem
+                            </button>
+                        </div>
+                    </div>
 
-        <div id="resultContainer" class="mt-5 text-center animate__animated animate__fadeIn">
-            <p class="text-muted my-5">Clique em "Analisar" para obter o diagnóstico</p>
-        </div>
-    </div>
+                    <!-- Results Section -->
+                    <div id="resultContainer" class="result-container glass-card">
+                        <div class="text-center py-4">
+                            <i class="bi bi-card-image" style="font-size: 3rem; color: #ccc;"></i>
+                            <h4 class="mt-3">Nenhum resultado disponível</h4>
+                            <p class="text-muted">Envie uma imagem e clique em "Analisar" para obter o diagnóstico</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
+            <!-- About Section -->
+            <section id="about" class="my-5 py-5 fade-in-up delay-2">
+                <h2 class="section-title">Nossa Tecnologia</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="glass-card p-4 h-100">
+                            <i class="bi bi-cpu-fill" style="font-size: 2rem; color: var(--primary);"></i>
+                            <h3 class="my-3">IA Avançada</h3>
+                            <p>Nossa plataforma utiliza modelos de deep learning treinados com milhares de imagens de folhas de soja para identificar doenças com alta precisão.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="glass-card p-4 h-100">
+                            <i class="bi bi-speedometer2" style="font-size: 2rem; color: var(--primary);"></i>
+                            <h3 class="my-3">Resultados Rápidos</h3>
+                            <p>Obtenha diagnósticos em segundos, permitindo ações rápidas para proteger sua plantação e maximizar sua produtividade.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Loading Modal -->
     <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-center p-4">
-                <div class="spinner-border text-light mb-3" role="status"></div>
-                <h5>Processando imagem...</h5>
+        <div class="modal-dialog modal-dialog-centered modal-loading">
+            <div class="modal-content modal-loading-content text-center p-4 border-0">
+                <div class="spinner-border spinner text-light mb-3" role="status"></div>
+                <h4 class="text-white">Processando sua imagem...</h4>
+                <p class="text-white-50 mt-2">Estamos analisando sua foto com nossa IA especializada</p>
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 AgroIntelliVision. Todos os direitos reservados.</p>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="text-center mb-4">
+                <div class="footer-logo">
+                    <span>🌱</span>
+                    <span>AgroIntelliVision</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#about" class="footer-link">Sobre</a>
+                    <a href="#how-it-works" class="footer-link">Como Funciona</a>
+                    <a href="#contact" class="footer-link">Contato</a>
+                    <a href="#" class="footer-link">Termos</a>
+                    <a href="#" class="footer-link">Privacidade</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AgroIntelliVision. Todos os direitos reservados.</p>
+            </div>
+        </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
+    
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Make navbar scrolled on page load if not at top
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.scrollY > 50) {
+                document.querySelector('.navbar').classList.add('scrolled');
+            }
+        });
+    </script>
 </body>
 </html>
