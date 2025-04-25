@@ -1,6 +1,12 @@
 from tensorflow import keras
 from config import settings
 
+print("Exemplo de batch:")
+for images, labels in train_ds.take(1):
+    print("Shape das imagens:", images.shape)
+    print("Shape dos rótulos:", labels.shape)
+    break
+
 def get_optimizer(steps_per_epoch):
     lr_schedule = keras.optimizers.schedules.CosineDecayRestarts(
         initial_learning_rate=1e-3,  # Aumentei a taxa inicial
@@ -16,13 +22,13 @@ def get_optimizer(steps_per_epoch):
 def compile_model(model, optimizer):
     model.compile(
         optimizer=optimizer,
-        loss='sparse_categorical_crossentropy',
+        loss='categorical_crossentropy',  # Mude de 'sparse_categorical_crossentropy'
         metrics=[
             'accuracy',
             keras.metrics.Precision(name='precision'),
             keras.metrics.Recall(name='recall'),
-            keras.metrics.AUC(name='auc', curve='ROC'),  # Adicionei curve ROC
-            keras.metrics.TopKCategoricalAccuracy(k=3, name='top3_accuracy')  # Nova métrica
+            keras.metrics.AUC(name='auc'),
+            keras.metrics.TopKCategoricalAccuracy(k=3, name='top3_accuracy')  # Atualizado
         ]
     )
     return model

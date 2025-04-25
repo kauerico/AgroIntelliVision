@@ -45,21 +45,21 @@ def main():
     # 4. Carregando os dados
     print("\n📂 Carregando dataset...")
     train_ds = train_datagen.flow_from_directory(
-        train_path,
-        target_size=settings.IMG_SIZE,
-        batch_size=settings.BATCH_SIZE,
-        class_mode='sparse',
-        shuffle=True,
-        seed=42
-    )
-    
+    train_path,
+    target_size=settings.IMG_SIZE,
+    batch_size=settings.BATCH_SIZE,
+    class_mode='categorical',  # Mude de 'sparse' para 'categorical'
+    shuffle=True,
+    seed=42
+)
+
     val_ds = val_datagen.flow_from_directory(
-        val_path,
-        target_size=settings.IMG_SIZE,
-        batch_size=settings.BATCH_SIZE,
-        class_mode='sparse',
-        shuffle=False
-    )
+    val_path,
+    target_size=settings.IMG_SIZE,
+    batch_size=settings.BATCH_SIZE,
+    class_mode='categorical',  # Aqui também
+    shuffle=False
+)
 
     # 5. Visualização da distribuição das classes
     print("\n📊 Gerando gráfico de distribuição...")
@@ -99,13 +99,17 @@ def main():
 
     # 7. Treinamento
     print("\n🎯 Iniciando treinamento...")
+   # Substitua a linha do model.fit() por:
     history = model.fit(
-        train_ds,
-        validation_data=val_ds,
-        epochs=settings.EPOCHS,
-        callbacks=get_callbacks(),
-        verbose=1
-    )
+    train_ds,
+    validation_data=val_ds,
+    epochs=settings.EPOCHS,
+    callbacks=get_callbacks(),
+    verbose=1,
+    workers=4,  # Adicione estas 3 linhas
+    use_multiprocessing=True,
+    max_queue_size=10
+)
 
     # 8. Fine-tuning
     print("\n🔧 Ajuste fino (fine-tuning)...")
