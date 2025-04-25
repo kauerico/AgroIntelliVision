@@ -8,6 +8,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Habilita CORS para todas as rotas
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
 # Carrega o modelo
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
