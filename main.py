@@ -1,82 +1,104 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+import os
+import matplotlib.pyplot as plt
+from datetime import datetime
 from config import settings
 from data.visualization import plot_class_distribution
 from models.build_model import build_model
 from models.train import get_optimizer, compile_model
 from utils.callbacks import get_callbacks
 
-# Verifica se o diretório de treino existe
-# Se não existir, levanta uma exceção
-# para evitar erros mais tarde
-# e facilitar o debugging
-import os
-train_path = os.path.join(settings.DATASET_PATH, 'train')
-if not os.path.exists(train_path):
-    raise Exception(f"Pasta de treino não encontrada em: {train_path}")
-
 def main():
     # 1. Configuração inicial
     if settings.MIXED_PRECISION and tf.config.list_physical_devices('GPU'):
         policy = tf.keras.mixed_precision.Policy('mixed_float16')
         tf.keras.mixed_precision.set_global_policy(policy)
-        print('Mixed precision enabled')
+        print('✅ Mixed precision habilitado')
 
-    # 2. Pré-processamento com aumento de dados
+    # 2. Verificação das pastas do dataset
+    train_path = os.path.join(settings.DATASET_PATH, 'train')
+    val_path = os.path.join(settings.DATASET_PATH, 'val')
+    
+    if not os.path.exists(train_path):
+        raise Exception(f"❌ Pasta de treino não encontrada em: {train_path}\n"
+                      f"Certifique-se que:\n"
+                      f"- O caminho em settings.py está correto\n"
+                      f"- Existe uma pasta 'train' com subpastas para cada classe")
+    
+    # 3. Pré-processamento com aumento de dados
     train_datagen = keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
-        rotation_range=25,  # Aumentado
-        width_shift_range=0.15,  # Reduzido para evitar distorções muito grandes
+        rotation_range=25,
+        width_shift_range=0.15,
         height_shift_range=0.15,
         shear_range=0.15,
         zoom_range=0.2,
         horizontal_flip=True,
-        vertical_flip=True,  # Adicionado
-        fill_mode='reflect'  # Melhor para imagens naturais
+        vertical_flip=True,
+        fill_mode='reflect'
     )
     
     val_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
 
-    # 3. Carregando os dados
+    # 4. Carregando os dados
+    print("\n📂 Carregando dataset...")
     train_ds = train_datagen.flow_from_directory(
-        f'{settings.DATASET_PATH}/train',
+        train_path,
         target_size=settings.IMG_SIZE,
         batch_size=settings.BATCH_SIZE,
         class_mode='sparse',
         shuffle=True,
-        seed=42  # Para reprodutibilidade
+        seed=42
     )
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    print("\nDistribuição das classes de treino:")
-    plt.figure(figsize=(10, 5))
-    plt.bar(list(train_ds.class_indices.keys()), np.bincount(train_ds.classes))
-    plt.title('Distribuição das Classes (Treino)')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
     
     val_ds = val_datagen.flow_from_directory(
-        f'{settings.DATASET_PATH}/val',
+        val_path,
         target_size=settings.IMG_SIZE,
         batch_size=settings.BATCH_SIZE,
         class_mode='sparse',
-        shuffle=False  # Importante para validação
+        shuffle=False
     )
 
-    # 4. Visualização da distribuição das classes
-    plot_class_distribution(train_ds.class_indices, np.bincount(train_ds.classes))
+    # 5. Visualização da distribuição das classes
+    print("\n📊 Gerando gráfico de distribuição...")
+    plt.figure(figsize=(12, 6))
+    bars = plt.bar(list(train_ds.class_indices.keys()), 
+                  np.bincount(train_ds.classes),
+                  color='#4c72b0')
+    
+    # Adiciona valores nas barras
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height,
+                f'{int(height)}',
+                ha='center', va='bottom')
+    
+    plt.title(f'Distribuição de Imagens por Classe\nTotal: {sum(np.bincount(train_ds.classes))} imagens', pad=20)
+    plt.xlabel('Classes')
+    plt.ylabel('Quantidade')
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(axis='y', linestyle='--', alpha=0.4)
+    plt.tight_layout()
 
-    # 5. Construção do modelo
+    # Salva o gráfico
+    os.makedirs(os.path.join('images', 'graficos'), exist_ok=True)
+    graph_path = os.path.join('images', 'graficos', 
+                            f'distribuicao_classes_{datetime.now().strftime("%Y%m%d")}.png')
+    plt.savefig(graph_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"✔ Gráfico salvo em: {graph_path}")
+
+    # 6. Construção do modelo
+    print("\n🛠️ Construindo modelo...")
     model = build_model()
     optimizer = get_optimizer(len(train_ds))
     model = compile_model(model, optimizer)
     model.summary()
 
-    # 6. Treinamento inicial
-    print("\nIniciando treinamento base...")
+    # 7. Treinamento
+    print("\n🎯 Iniciando treinamento...")
     history = model.fit(
         train_ds,
         validation_data=val_ds,
@@ -85,16 +107,14 @@ def main():
         verbose=1
     )
 
-    # 7. Fine-tuning
-    print("\nIniciando fine-tuning...")
+    # 8. Fine-tuning
+    print("\n🔧 Ajuste fino (fine-tuning)...")
     model.get_layer('efficientnetv2-b0').trainable = True
     
-    # Otimizador com learning rate menor para fine-tuning
     fine_tune_optimizer = keras.optimizers.Adam(
-        learning_rate=1e-5,  # LR menor que o inicial
+        learning_rate=1e-5,
         beta_1=0.9,
-        beta_2=0.999,
-        epsilon=1e-07
+        beta_2=0.999
     )
     
     model.compile(
@@ -106,20 +126,15 @@ def main():
     history_fine = model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=settings.EPOCHS + 15,  # Aumentei +15 epochs para fine-tuning
+        epochs=settings.EPOCHS + 15,
         initial_epoch=history.epoch[-1] + 1,
         callbacks=get_callbacks(),
         verbose=1
     )
 
-    # 8. Salvamento do modelo
-    print("\nSalvando modelo final...")
+    # 9. Salvamento do modelo
     model.save('modelo_soja_final.keras')
-    
-    # 9. Avaliação final
-    print("\nAvaliando modelo final...")
-    eval_results = model.evaluate(val_ds, verbose=1)
-    print(f"Resultados finais - Loss: {eval_results[0]}, Accuracy: {eval_results[1]}")
+    print("\n✅ Modelo salvo como 'modelo_soja_final.keras'")
 
 if __name__ == "__main__":
     main()
