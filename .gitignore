@@ -174,4 +174,15 @@ cython_debug/
 .pypirc
 
 data/DataSet/
+# Ignorar arquivos executáveis do fonttools
+agro/Scripts/fonttools.exe
+agro/Scripts/pyftmerge.exe
+agro/Scripts/pyftsubset.exe
+agro/Scripts/ttx.exe
+
+# Ignorar arquivos da pasta man
+agro/share/man/**
+
+# Ou ignorar tudo da pasta Scripts
+# agro/Scripts/*
 
