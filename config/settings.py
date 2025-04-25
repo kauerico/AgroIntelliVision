@@ -1,5 +1,7 @@
+import tensorflow as tf
+
 # Configurações globais
-DATASET_PATH = "/content/drive/MyDrive/seu_caminho_para_dataset"
+DATASET_PATH = r"C:\Users\katys\OneDrive\Documentos\GitHub\AgroIntelliVision\data"  # Note o 'r' antes da string # Ajuste conforme necessário
 BATCH_SIZE = 32  # Reduzi para melhor uso de memória
 IMG_SIZE = (256, 256)  # Mantenha consistente com seu modelo
 EPOCHS = 50  # Aumentei um pouco

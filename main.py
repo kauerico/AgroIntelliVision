@@ -7,6 +7,15 @@ from models.build_model import build_model
 from models.train import get_optimizer, compile_model
 from utils.callbacks import get_callbacks
 
+# Verifica se o diretório de treino existe
+# Se não existir, levanta uma exceção
+# para evitar erros mais tarde
+# e facilitar o debugging
+import os
+train_path = os.path.join(settings.DATASET_PATH, 'train')
+if not os.path.exists(train_path):
+    raise Exception(f"Pasta de treino não encontrada em: {train_path}")
+
 def main():
     # 1. Configuração inicial
     if settings.MIXED_PRECISION and tf.config.list_physical_devices('GPU'):
@@ -38,6 +47,16 @@ def main():
         shuffle=True,
         seed=42  # Para reprodutibilidade
     )
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    print("\nDistribuição das classes de treino:")
+    plt.figure(figsize=(10, 5))
+    plt.bar(list(train_ds.class_indices.keys()), np.bincount(train_ds.classes))
+    plt.title('Distribuição das Classes (Treino)')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
     
     val_ds = val_datagen.flow_from_directory(
         f'{settings.DATASET_PATH}/val',
