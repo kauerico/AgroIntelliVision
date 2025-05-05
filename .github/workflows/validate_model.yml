@@ -27,7 +27,7 @@ jobs:
 
       - name: 🚀 Rodar script de avaliação
         run: |
-          python avaliador.py \
+          python models/test_models/main.py \
             --model-path models/saved_models/modelo_soja.h5 \
             --dataset-dir data/sample_validation \
             --output-dir models/test_models/reports
