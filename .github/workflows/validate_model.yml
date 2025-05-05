@@ -33,7 +33,7 @@ jobs:
             --output-dir models/test_models/reports
 
       - name: 📁 Fazer upload do relatório
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: relatorio-classificacao
           path: reports/*.html
