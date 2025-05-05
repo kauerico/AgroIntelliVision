@@ -11,6 +11,9 @@ myenv
 # Ignorando DataSet
 /data/raw/DataSet
 
+./utils
+utils
+
 
 # Distribution / packaging
 .Python

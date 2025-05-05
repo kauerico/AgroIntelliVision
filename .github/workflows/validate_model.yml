@@ -1,32 +1,39 @@
-name: Validação Deepchecks
+name: Avaliar Modelo
 
 on:
   push:
+    paths:
+      - 'models/test_models/main.py'
+      - 'models/saved_models/modelo_soja.h5'
+      - 'data/sample_validation'
+      - '.github/workflows/validate_model.yml'
+  workflow_dispatch:  # permite rodar manualmente.
 
 jobs:
-  deepchecks-validation:
-    name: Validação com Deepchecks
+  avaliar:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v3
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v3
 
-    - name: Verificar diretórios montados
-      run: |
-        ls -la ${{ github.workspace }}/models/saved_models || echo "Diretório models/saved_models não encontrado"
-        ls -la ${{ github.workspace }}/datasets/soja_images || echo "Diretório datasets/soja_images não encontrado"
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-    - name: Rodar validação com imagem do Docker Hub
-      run: |
-        docker run --rm \
-          -v ${{ github.workspace }}/models/saved_models:/models \
-          -v ${{ github.workspace }}/datasets/soja_images:/imagens \
-          -v ${{ github.workspace }}:/workspace \
-          seu_usuario_dockerhub/deepchecks-validator:latest
+      - name: 📦 Instalar dependências
+        run: pip install -r requirements.txt
 
-    - name: Upload do relatório
-      uses: actions/upload-artifact@v4
-      with:
-        name: validation-report
-        path: validation_report.html
+      - name: 🚀 Rodar script de avaliação
+        run: |
+          python avaliador.py \
+            --model-path models/saved_models/modelo_soja.h5 \
+            --dataset-dir data/sample_validation \
+            --output-dir models/test_models/reports
+
+      - name: 📁 Fazer upload do relatório
+        uses: actions/upload-artifact@v3
+        with:
+          name: relatorio-classificacao
+          path: reports/*.html
