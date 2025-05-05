@@ -23,7 +23,7 @@ jobs:
           python-version: '3.10'
 
       - name: 📦 Instalar dependências
-        run: pip install -r requirements.txt
+        run: pip install -r models/test_models/requirements.txt
 
       - name: 🚀 Rodar script de avaliação
         run: |
