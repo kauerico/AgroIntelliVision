@@ -1,0 +1,18 @@
+# Usa imagem base com suporte ao TensorFlow
+FROM tensorflow/tensorflow:latest
+
+# Instala dependências adicionais
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    && pip install --upgrade pip
+
+# Copia os arquivos da aplicação
+WORKDIR /app
+COPY main.py /app/
+COPY requirements.txt /app/
+
+# Instala as bibliotecas necessárias
+RUN pip install -r requirements.txt
+
+# Ponto de entrada padrão
+ENTRYPOINT ["python3", "main.py"]
