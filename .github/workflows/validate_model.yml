@@ -36,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: relatorio-classificacao
-          path: reports/*.html
+          path: models/test_models/reports/*.html
