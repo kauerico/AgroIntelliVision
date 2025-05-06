@@ -1,15 +1,13 @@
 import tensorflow as tf
+import os
 
-# Configurações globais
-# Altere para:
-DATASET_PATH = r"C:\Users\katys\OneDrive\Documentos\GitHub\AgroIntelliVision\data\DataSet"  # Note o 'r' antes da string # Ajuste conforme necessário
-BATCH_SIZE = 32  # Reduzi para melhor uso de memória
-IMG_SIZE = (256, 256)  # Mantenha consistente com seu modelo
-EPOCHS = 50  # Aumentei um pouco
-NUM_CLASSES = 8  # Corrigi para bater com suas classes reais
-# Limitação de tamanho de arquivo
-
-
-# Otimizações de performance
+BATCH_SIZE = 16  # Reduza para evitar estouro de memória (8 se ainda der problemas)
+IMG_SIZE = (224, 224)  # Tamanho menor = menos RAM
+EPOCHS = 10  # Comece com menos épocas (aumente depois se necessário)
+NUM_CLASSES = 8
 AUTOTUNE = tf.data.AUTOTUNE
-MIXED_PRECISION = True
+MIXED_PRECISION = False  # Desative se não tiver GPU
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATASET_PATH = os.path.join(BASE_DIR, 'data', 'DataSet')

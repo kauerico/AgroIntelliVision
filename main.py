@@ -4,56 +4,65 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from datetime import datetime
+from sklearn.utils.class_weight import compute_class_weight
 from config import settings
 from models.build_model import build_model
 from models.train import get_optimizer, compile_model
 from utils.callbacks import get_callbacks
 
-# Desativa mensagens verbosas do oneDNN
+# Configurações para reduzir consumo de memória
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Reduz logs do TensorFlow
+
+def verify_dataset(train_path, val_path):
+    """Verifica a estrutura e balanceamento do dataset"""
+    print("\n🔍 Verificando dataset...")
+    
+    if not os.path.exists(train_path) or not os.path.exists(val_path):
+        raise Exception("Estrutura inválida. Deve conter subpastas train/ e val/")
+
+    class_counts = {}
+    for split in ['train', 'val']:
+        split_path = train_path if split == 'train' else val_path
+        print(f"\n{split.upper()}:")
+        for class_name in os.listdir(split_path):
+            class_path = os.path.join(split_path, class_name)
+            if os.path.isdir(class_path):
+                num_images = len([f for f in os.listdir(class_path) if f.endswith(('.jpg', '.png', '.jpeg'))])
+                class_counts[f"{split}_{class_name}"] = num_images
+                print(f"{class_name}: {num_images} imagens")
+                
+                if split == 'train' and num_images < 100:
+                    print(f"⚠️ Aviso: Classe {class_name} tem apenas {num_images} imagens (recomendado >=100)")
+    return class_counts
 
 def main():
     # 1. Configuração inicial
-    print("⚙️ Configurando ambiente...")
-    if settings.MIXED_PRECISION and tf.config.list_physical_devices('GPU'):
-        policy = keras.mixed_precision.Policy('mixed_float16')
-        keras.mixed_precision.set_global_policy(policy)
-        print("✅ Precisão mista ativada")
+    print("⚙️ Configurando ambiente para CPU...")
+    tf.config.set_visible_devices([], 'GPU')  # Força uso da CPU
 
-    # 2. Verificação da estrutura do dataset
-    print("\n🔍 Verificando estrutura do dataset...")
+    # 2. Caminhos do dataset
     train_path = os.path.join(settings.DATASET_PATH, 'train')
     val_path = os.path.join(settings.DATASET_PATH, 'val')
     
-    if not os.path.exists(train_path):
-        raise Exception(f"❌ Pasta de treino não encontrada em: {train_path}\n"
-                      f"Estrutura esperada:\n"
-                      f"{settings.DATASET_PATH}/\n"
-                      f"├── train/\n"
-                      f"│   ├── classe1/\n"
-                      f"│   └── classe2/\n"
-                      f"└── val/\n"
-                      f"    ├── classe1/\n"
-                      f"    └── classe2/")
+    # 3. Verificação do dataset
+    class_counts = verify_dataset(train_path, val_path)
 
-    # 3. Pré-processamento dos dados
+    # 4. Pré-processamento (lightweight para CPU)
     print("\n🔄 Preparando dados...")
     train_datagen = keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
-        rotation_range=25,
-        width_shift_range=0.15,
-        height_shift_range=0.15,
-        shear_range=0.15,
+        rotation_range=15,       # Reduzido para CPU
+        width_shift_range=0.1,   # Reduzido
+        height_shift_range=0.1,  # Reduzido
         zoom_range=0.2,
         horizontal_flip=True,
-        fill_mode='reflect',
-        brightness_range=[0.8, 1.2]  # Adicionado variação de brilho
+        fill_mode='nearest'      # Mais eficiente que 'reflect'
     )
     
-    # Gerador para dados de validação (sem aumento de dados)
     val_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
 
-    # 4. Carregamento dos dados
+    # 5. Carregamento dos dados
     print("\n📂 Carregando imagens...")
     train_ds = train_datagen.flow_from_directory(
         train_path,
@@ -72,141 +81,78 @@ def main():
         shuffle=False
     )
 
-    # 5. Verificação do formato dos dados
-    print("\n🔍 Verificando formato dos dados:")
-    try:
-        # Pega o primeiro batch de dados
-        imagens, rotulos = next(train_ds)
-        
-        print(f"Formato das imagens: {imagens.shape}")
-        print(f"Formato dos rótulos: {rotulos.shape}")
-        print(f"Exemplo de rótulo: {rotulos[0]}")
-        
-        # Visualiza uma imagem de exemplo
-        plt.figure(figsize=(6,6))
-        plt.imshow(imagens[0])
-        plt.title(f"Classe: {np.argmax(rotulos[0])}")
-        plt.axis('off')
-        
-        # Salva a visualização
-        os.makedirs(os.path.join('images', 'graficos'), exist_ok=True)
-        plt.savefig(os.path.join('images', 'graficos', 'imagem_exemplo.png'), 
-                   bbox_inches='tight', dpi=150)
-        plt.close()
-        print("✅ Verificação dos dados concluída com sucesso")
-        
-    except Exception as e:
-        print(f"❌ Falha na verificação: {str(e)}")
-        raise
-
-    # 6. Visualização da distribuição das classes
-    print("\n📊 Gerando gráfico de distribuição das classes...")
-    # Método robusto para contar as classes
-    contagem_classes = np.zeros(len(train_ds.class_indices))
-    samples = 0
+    # 6. Otimização de performance (ADICIONE AQUI)
+    train_ds = train_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
+    val_ds = val_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
     
-    for i, (_, labels) in enumerate(train_ds):
-        contagem_classes += np.sum(labels, axis=0)
-        samples += labels.shape[0]
-        
-        if i >= len(train_ds) - 1:  # Quando completa um epoch
-            break
-    
-    total_imagens = int(np.sum(contagem_classes))
-    class_names = list(train_ds.class_indices.keys())
+    # Opcional: Se ainda houver OOM, adicione:
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.OFF
+    train_ds = train_ds.with_options(options)
+    val_ds = val_ds.with_options(options)
 
-    plt.figure(figsize=(12,6))
-    barras = plt.bar(class_names, contagem_classes, color='#1f77b4')
+    # 7. Class weights para dados desbalanceados
+    print("\n⚖️ Calculando class weights...")
+    class_weights = compute_class_weight('balanced',
+                                       classes=np.unique(train_ds.classes),
+                                       y=train_ds.classes)
+    class_weights = dict(enumerate(class_weights))
+    print("Class weights:", class_weights)
 
-    # Adiciona valores nas barras
-    for barra in barras:
-        altura = barra.get_height()
-        plt.text(barra.get_x() + barra.get_width()/2., altura,
-                f'{int(altura)}',
-                ha='center', va='bottom')
-    
-    plt.title(f'Distribuição das Classes (Total: {total_imagens} imagens)', pad=20)
-    plt.xlabel('Classes')
-    plt.ylabel('Quantidade')
-    plt.xticks(rotation=45, ha='right')
-    plt.grid(axis='y', linestyle='--', alpha=0.4)
-    plt.tight_layout()
+    # 8. Construção do modelo (leve para CPU)
+    print("\n🛠️ Construindo modelo MobileNetV3 (otimizado para CPU)...")
+    model = build_model()
+    optimizer = get_optimizer(len(train_ds))
+    model = compile_model(model, optimizer)
+    model.summary()
 
-    # Salva o gráfico de distribuição
-    os.makedirs(os.path.join('images', 'graficos'), exist_ok=True)
-    caminho_grafico = os.path.join('images', 'graficos', 
-                                 f'distribuicao_classes_{datetime.now().strftime("%Y%m%d_%H%M")}.png')
-    plt.savefig(caminho_grafico, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"✅ Gráfico salvo em: {caminho_grafico}")
+    # 9. Callbacks com TensorBoard
+    callbacks = [
+        keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True),
+        keras.callbacks.ModelCheckpoint("best_model.keras", save_best_only=True),
+        keras.callbacks.TensorBoard(log_dir='logs'),  # Para monitoramento
+        keras.callbacks.ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.5,
+            patience=3,
+            min_lr=1e-6
+        )
+    ]
 
-    # 7. Construção do modelo
-    print("\n🛠️ Construindo o modelo...")
-    modelo = build_model()
-    otimizador = get_optimizer(len(train_ds))
-    modelo = compile_model(modelo, otimizador)
-    modelo.summary()
-
-    # 8. Treinamento
+    # 10. Treinamento (épocas reduzidas inicialmente)
     print(f"\n🎯 Iniciando treinamento ({settings.EPOCHS} épocas)...")
-    historico = modelo.fit(
+    history = model.fit(
         train_ds,
         validation_data=val_ds,
         epochs=settings.EPOCHS,
-        callbacks=get_callbacks(),
-        verbose=1,
-        
-    )
-
-    # 9. Fine-tuning (ajuste fino)
-    print("\n🔧 Aplicando fine-tuning...")
-    modelo.get_layer('efficientnetv2-b0').trainable = True
-    modelo.compile(
-        optimizer=keras.optimizers.Adam(1e-5),
-        loss='categorical_crossentropy',
-        metrics=modelo.compiled_metrics.metrics
-    )
-    
-    historico_fine = modelo.fit(
-        train_ds,
-        validation_data=val_ds,
-        epochs=settings.EPOCHS + 10,
-        initial_epoch=historico.epoch[-1] + 1,
-        callbacks=get_callbacks(),
+        callbacks=callbacks,
+        class_weight=class_weights,
         verbose=1
     )
 
-    # 10. Salvamento do modelo
-    modelo.save('modelo_soja_final.keras')
-    print("\n✅ Modelo treinado salvo como 'modelo_soja_final.keras'")
+    # 11. Salvamento do modelo
+    model.save('modelo_soja_final_cpu.keras')
+    print("\n✅ Modelo salvo como 'modelo_soja_final_cpu.keras'")
 
-    # 11. Plots de desempenho
-    print("\n📈 Gerando gráficos de desempenho...")
-    plt.figure(figsize=(12, 6))
-    
-    # Gráfico de acurácia
+    # 12. Visualização de resultados
+    plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
-    plt.plot(historico.history['accuracy'], label='Treino')
-    plt.plot(historico.history['val_accuracy'], label='Validação')
-    plt.title('Acurácia durante o Treinamento')
+    plt.plot(history.history['accuracy'], label='Treino')
+    plt.plot(history.history['val_accuracy'], label='Validação')
+    plt.title('Acurácia')
     plt.xlabel('Época')
-    plt.ylabel('Acurácia')
     plt.legend()
-    
-    # Gráfico de loss
+
     plt.subplot(1, 2, 2)
-    plt.plot(historico.history['loss'], label='Treino')
-    plt.plot(historico.history['val_loss'], label='Validação')
-    plt.title('Loss durante o Treinamento')
+    plt.plot(history.history['loss'], label='Treino')
+    plt.plot(history.history['val_loss'], label='Validação')
+    plt.title('Loss')
     plt.xlabel('Época')
-    plt.ylabel('Loss')
     plt.legend()
-    
+
     plt.tight_layout()
-    caminho_desempenho = os.path.join('images', 'graficos', 'desempenho_treinamento.png')
-    plt.savefig(caminho_desempenho, dpi=300, bbox_inches='tight')
+    plt.savefig('desempenho_treinamento_cpu.png', dpi=300)
     plt.close()
-    print(f"✅ Gráficos de desempenho salvos em: {caminho_desempenho}")
 
 if __name__ == "__main__":
     main()

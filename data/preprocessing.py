@@ -3,27 +3,41 @@ from tensorflow import keras
 from config import settings
 
 def create_data_flow(subset):
-    train_datagen = keras.preprocessing.image.ImageDataGenerator(
-        rescale=1./255,
-        validation_split=0.15,
-        rotation_range=45,
-        width_shift_range=0.3,
-        height_shift_range=0.3,
-        brightness_range=[0.7,1.3],
-        shear_range=0.2,
-        zoom_range=0.3,
-        horizontal_flip=True,
-        vertical_flip=True,
-        channel_shift_range=0.2,
-        fill_mode='reflect'
-    )
+    if subset == 'training':
+        datagen = keras.preprocessing.image.ImageDataGenerator(
+            rescale=1./255,
+            rotation_range=20,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True,
+            fill_mode='nearest'
+        )
+        return datagen.flow_from_directory(
+            os.path.join(settings.DATASET_PATH, 'train'),
+            target_size=settings.IMG_SIZE,
+            batch_size=settings.BATCH_SIZE,
+            class_mode='categorical',
+            shuffle=True,
+            seed=42
+        )
+    else:
+        datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+        return datagen.flow_from_directory(
+            os.path.join(settings.DATASET_PATH, 'val'),
+            target_size=settings.IMG_SIZE,
+            batch_size=settings.BATCH_SIZE,
+            class_mode='categorical',
+            shuffle=False
+        )
     
-    return train_datagen.flow_from_directory(
+    return datagen.flow_from_directory(
         settings.DATASET_PATH,
         target_size=settings.IMG_SIZE,
         batch_size=settings.BATCH_SIZE,
         subset=subset,
-        class_mode='sparse',
-        shuffle=True,
+        class_mode='categorical',  # Alterado para categorical
+        shuffle=(subset == 'training'),
         seed=42
     )
