@@ -5,6 +5,8 @@ from PIL import Image
 import io
 import os
 from flask_cors import CORS
+from config import settings
+
 
 app = Flask(__name__)
 CORS(app)  # Habilita CORS para todas as rotas

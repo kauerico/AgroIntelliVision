@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 from tensorflow import keras
 from config import settings
@@ -14,30 +15,18 @@ def create_data_flow(subset):
             horizontal_flip=True,
             fill_mode='nearest'
         )
-        return datagen.flow_from_directory(
-            os.path.join(settings.DATASET_PATH, 'train'),
-            target_size=settings.IMG_SIZE,
-            batch_size=settings.BATCH_SIZE,
-            class_mode='categorical',
-            shuffle=True,
-            seed=42
-        )
+        directory = os.path.join(settings.DATASET_PATH, 'train')
+        shuffle = True
     else:
         datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
-        return datagen.flow_from_directory(
-            os.path.join(settings.DATASET_PATH, 'val'),
-            target_size=settings.IMG_SIZE,
-            batch_size=settings.BATCH_SIZE,
-            class_mode='categorical',
-            shuffle=False
-        )
-    
+        directory = os.path.join(settings.DATASET_PATH, 'val')
+        shuffle = False
+
     return datagen.flow_from_directory(
-        settings.DATASET_PATH,
+        directory,
         target_size=settings.IMG_SIZE,
         batch_size=settings.BATCH_SIZE,
-        subset=subset,
-        class_mode='categorical',  # Alterado para categorical
-        shuffle=(subset == 'training'),
+        class_mode='categorical',
+        shuffle=shuffle,
         seed=42
     )

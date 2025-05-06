@@ -50,7 +50,7 @@ def main():
 
     # 4. Pré-processamento (lightweight para CPU)
     print("\n🔄 Preparando dados...")
-    train_datagen = keras.preprocessing.image.ImageDataGenerator(
+    train_datagen = keras.preprocessing.image.ImageDataGenerator(  # Através dessa linha de código, o TensorFlow irá automaticamente utilizar a CPU para o pré-processamento
         rescale=1./255,
         rotation_range=15,       # Reduzido para CPU
         width_shift_range=0.1,   # Reduzido
@@ -60,7 +60,7 @@ def main():
         fill_mode='nearest'      # Mais eficiente que 'reflect'
     )
     
-    val_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+    val_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255) # Aqui é feita a normalização dos dados de validação
 
     # 5. Carregamento dos dados
     print("\n📂 Carregando imagens...")
@@ -81,15 +81,9 @@ def main():
         shuffle=False
     )
 
-    # 6. Otimização de performance (ADICIONE AQUI)
-    train_ds = train_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
-    val_ds = val_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
-    
-    # Opcional: Se ainda houver OOM, adicione:
-    options = tf.data.Options()
-    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.OFF
-    train_ds = train_ds.with_options(options)
-    val_ds = val_ds.with_options(options)
+
+
+
 
     # 7. Class weights para dados desbalanceados
     print("\n⚖️ Calculando class weights...")
