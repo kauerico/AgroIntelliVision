@@ -18,7 +18,7 @@ import io
 import os
 
 # ==============================================================================
-#   CORREÇÃO: Atualizado o caminho para corresponder à localização real do modelo.
+#   Caminho para o modelo
 # ==============================================================================
 MODEL_PATH = os.path.join('models', 'saved_models', 'modelo_soja.h5')
 
@@ -35,36 +35,29 @@ except Exception as e:
     print(f"!!! Erro fatal ao carregar o modelo: {e}")
     model = None # Garante que o modelo é None se o carregamento falhar
 
+# ==============================================================================
+#   REATORAÇÃO: A lista de classes foi reduzida para focar nas doenças mais
+#   recorrentes no Brasil, tornando o modelo mais específico e prático.
+# ==============================================================================
 # --- Nomes das Classes ---
-# IMPORTANTE: A ordem dos nomes deve ser EXATAMENTE a mesma usada durante o treino do modelo.
-# A lista foi atualizada com nomes reais de doenças. Verifique se a ordem está correta!
+# ATENÇÃO: O seu modelo de IA (`modelo_soja.h5`) precisa ser treinado novamente
+# com exatamente estas 8 classes e nesta mesma ordem para que o código funcione
+# corretamente. Se o modelo atual espera 16 saídas, ele será incompatível.
 class_names = [
-    'Ferrugem Asiática',          # Classe 0
-    'Mancha Alvo',                # Classe 1
-    'Oídio',                      # Classe 2
-    'Mancha Bacteriana',          # Classe 3
-    'Míldio',                     # Classe 4
+    'Ferrugem Asiática',                # Classe 0
+    'Mancha Alvo',                      # Classe 1
+    'Oídio',                            # Classe 2
+    'Mancha Olho-de-Rã',                # Classe 3
+    'Míldio',                           # Classe 4
     'Crestamento Foliar de Cercospora', # Classe 5
-    'Mancha Olho-de-Rã',          # Classe 6
-    'Septoriose',                 # Classe 7
-    'Antracnose',                 # Classe 8
-    'Cancro da Haste',            # Classe 9
-    'Podridão Parda da Haste',    # Classe 10
-    'Mosaico Comum',              # Classe 11
-    'Mancha Parda',               # Classe 12
-    'Podridão de Sclerotinia',    # Classe 13
-    'Deficiência de Potássio',    # Classe 14
-    'Folha Saudável'              # Classe 15
+    'Antracnose',                       # Classe 6
+    'Folha Saudável'                    # Classe 7
 ]
+
 
 def preprocess_image(image_bytes, target_size=(64, 64)):
     """
     Pré-processa a imagem recebida para o formato que o modelo espera.
-    1. Abre a imagem a partir de bytes.
-    2. Converte para o formato RGB.
-    3. Redimensiona para o tamanho alvo.
-    4. Converte para um array numpy e normaliza os pixels para o intervalo [0, 1].
-    5. Adiciona uma dimensão extra para representar o "batch" (lote).
     """
     image = Image.open(io.BytesIO(image_bytes))
     if image.mode != 'RGB':
@@ -86,17 +79,14 @@ def predict():
     """
     Endpoint da API que recebe um ficheiro de imagem e retorna um diagnóstico.
     """
-    # Verifica se o modelo foi carregado corretamente no início
     if model is None:
         return jsonify({'error': 'O modelo de machine learning não foi carregado corretamente no servidor.'}), 500
 
-    # Verifica se um ficheiro foi enviado na requisição
     if 'file' not in request.files:
         return jsonify({'error': 'Nenhum ficheiro foi enviado na requisição.'}), 400
 
     file = request.files['file']
 
-    # Verifica se o ficheiro tem um nome (evita envios vazios)
     if file.filename == '':
         return jsonify({'error': 'Ficheiro inválido ou sem nome.'}), 400
 
@@ -131,8 +121,6 @@ def predict():
 
 # ==============================================================================
 #   Ponto de Entrada da Aplicação
-#   Este bloco de código inicia o servidor web do Flask.
-#   É a adição crucial que estava a faltar para que o seu backend ficasse online.
 # ==============================================================================
 if __name__ == '__main__':
     # app.run() inicia o servidor.
