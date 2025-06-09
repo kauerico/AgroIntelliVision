@@ -2,10 +2,7 @@
     index.html
 
     Página principal do projeto AgroIntelliVision - Detector de Doenças da Soja.
-
-    Este arquivo HTML implementa uma aplicação web para upload e análise de imagens de folhas de soja,
-    utilizando inteligência artificial para detecção de doenças. O código está organizado em seções bem definidas,
-    com comentários detalhados para facilitar o entendimento e a manutenção.
+    Versão com design renovado, incluindo imagem de fundo e logo da instituição.
 
     Desenvolvedores:
     - Kaue Ribeiro Costa
@@ -13,7 +10,7 @@
 
     Coordenador:
     - Patrick Ola Bressan
-A
+
     © 2024 AgroIntelliVision - Todos os direitos reservados.
 -->
 <!DOCTYPE html>
@@ -31,10 +28,32 @@ A
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Estilos customizados para componentes específicos -->
+    <!-- Estilos customizados para componentes específicos e background -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            /*
+             * BACKGROUND COM IMAGEM E COR DE FALLBACK
+             * Adicionada uma cor de fundo escura (#1a2e21). Se a imagem da web
+             * não carregar por qualquer motivo, a página terá este fundo escuro
+             * em vez de um fundo branco, garantindo uma boa aparência.
+            */
+            background-color: #1a2e21; /* Cor de fundo verde-escura como alternativa */
+            /* ATUALIZAÇÃO: Imagem de fundo alterada conforme solicitado. */
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        /* Overlay para escurecer o fundo e melhorar a legibilidade do texto */
+        .backdrop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); 
+            z-index: -1;
         }
         /* Estilo para o label do input de arquivo */
         .file-input-label {
@@ -59,23 +78,29 @@ A
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="text-gray-800">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+    <div class="backdrop-overlay"></div>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl min-h-screen flex flex-col justify-center">
 
         <!-- =======================
              Cabeçalho do Projeto
         ======================== -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-green-700">AgroIntelliVision</h1>
-            <p class="text-md md:text-lg text-gray-600 mt-2">Detecção de Doenças na Folhagem da Soja</p>
-            <p class="text-sm text-gray-500">Projeto de Pesquisa - IFMS Campus Jardim</p>
+            <!-- Logo do IFMS -->
+            <img src="https://www.ifms.edu.br/marcas/ifms_horizontal_principal.png" alt="Logo do IFMS Campus Jardim" class="w-64 mx-auto mb-4 bg-white/95 p-4 rounded-lg shadow-md"
+                 onerror="this.onerror=null;this.src='https://placehold.co/256x80/ffffff/000000?text=IFMS+Campus+Jardim';">
+            <div class="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg">
+                <h1 class="text-3xl md:text-4xl font-bold text-green-800">AgroIntelliVision</h1>
+                <p class="text-md md:text-lg text-gray-700 mt-2">Detecção de Doenças na Folhagem da Soja</p>
+            </div>
         </header>
 
         <!-- =======================
              Card Principal da Aplicação
         ======================== -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        <main class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 
                 <!-- =======================
@@ -83,17 +108,14 @@ A
                 ======================== -->
                 <div id="upload-area">
                     <h2 class="text-xl font-semibold mb-4 text-gray-700">1. Envie a imagem da folha</h2>
-                    <!-- Label estilizado para input de arquivo e drag-and-drop -->
-                    <label for="file-upload" class="file-input-label cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-10 text-center hover:bg-gray-100">
-                        <!-- Ícone ilustrativo de upload -->
-                        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V6a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 16v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l-4-4m0 0l-4 4m4-4v12"></path></svg>
-                        <p class="text-gray-600 font-medium">Arraste e solte o arquivo aqui</p>
-                        <p class="text-sm text-gray-500 mt-1">ou</p>
+                    <label for="file-upload" class="file-input-label bg-gray-50/70 cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg p-10 text-center hover:bg-gray-100">
+                        <svg class="w-12 h-12 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V6a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 16v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l-4-4m0 0l-4 4m4-4v12"></path></svg>
+                        <p class="text-gray-700 font-medium">Arraste e solte o arquivo aqui</p>
+                        <p class="text-sm text-gray-600 mt-1">ou</p>
                         <p class="mt-2 text-white bg-green-600 hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                             Selecione o arquivo
                         </p>
                     </label>
-                    <!-- Input de arquivo oculto, ativado pelo label acima -->
                     <input id="file-upload" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg">
                 </div>
 
@@ -102,40 +124,34 @@ A
                 ======================== -->
                 <div id="result-area" class="hidden">
                      <h2 class="text-xl font-semibold mb-4 text-gray-700">2. Resultado do Diagnóstico</h2>
-                     <div class="border rounded-lg p-4 bg-gray-50">
-                        <!-- Pré-visualização da imagem enviada -->
-                        <div class="mb-4">
-                            <img id="image-preview" src="#" alt="Pré-visualização da imagem" class="max-w-full h-auto max-h-64 mx-auto rounded-lg shadow-md">
+                     <div class="border rounded-lg p-4 bg-gray-50/70">
+                        <div class="mb-4 bg-white p-2 rounded-lg shadow-inner">
+                            <img id="image-preview" src="#" alt="Pré-visualização da imagem" class="w-full h-48 object-cover mx-auto rounded-lg">
                         </div>
-                        
-                        <!-- Resultado da análise: diagnóstico e confiança -->
-                        <div id="analysis-result">
-                            <div class="flex items-center justify-center mb-2">
-                                <p class="text-lg font-medium mr-2">Diagnóstico:</p>
-                                <p id="prediction-text" class="text-lg font-bold text-green-700"></p>
+                        <div id="analysis-result" class="space-y-3">
+                            <div class="flex items-center justify-between text-lg">
+                                <p class="font-medium">Diagnóstico:</p>
+                                <p id="prediction-text" class="font-bold text-green-800 px-3 py-1 rounded-full bg-gray-200"></p>
                             </div>
-                            <div class="flex items-center justify-center">
-                                <p class="text-md font-medium mr-2">Confiança:</p>
-                                <div class="w-full bg-gray-200 rounded-full h-4">
-                                    <div id="confidence-bar" class="bg-green-600 h-4 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none" style="width: 0%">
+                            <div class="flex items-center justify-between text-lg">
+                                <p class="font-medium">Confiança:</p>
+                                <div class="w-1/2 bg-gray-200 rounded-full h-6">
+                                    <div id="confidence-bar" class="bg-green-600 h-6 rounded-full text-sm font-medium text-white text-center flex items-center justify-center" style="width: 0%">
                                        <span id="confidence-text"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Spinner de carregamento exibido durante a análise -->
                         <div id="loading-spinner" class="hidden flex flex-col items-center justify-center py-10">
                             <div class="spinner"></div>
                             <p class="mt-4 text-gray-600">Analisando a imagem...</p>
                         </div>
                      </div>
-                     <!-- Botão para reiniciar o processo e analisar outra imagem -->
                      <button id="reset-button" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md">Analisar outra imagem</button>
                 </div>
                 
                  <!-- =======================
-                      Área Placeholder (quando nenhuma imagem foi enviada)
+                      Área Placeholder
                  ======================== -->
                  <div id="placeholder-area" class="flex flex-col items-center justify-center h-full text-center text-gray-500">
                     <svg class="w-20 h-20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
@@ -143,64 +159,52 @@ A
                     <p class="mt-1">O resultado da análise aparecerá aqui.</p>
                 </div>
             </div>
-        </div>
+        </main>
 
         <!-- =======================
-             Rodapé com informações institucionais
+             Rodapé
         ======================== -->
-        <footer class="text-center mt-10 text-sm text-gray-500">
-            <p><strong>Coordenador:</strong> Patrick Ola Bressan</p>
-            <p><strong>Desenvolvedores do Projeto:</strong> Kaue Ribeiro Costa, Katcilane Silva de Souza</p>
-            <p class="mt-2">&copy; 2024 AgroIntelliVision - Todos os direitos reservados.</p>
+        <footer class="text-center mt-10 text-sm text-white/90 leading-relaxed">
+            <!-- Rodapé atualizado conforme solicitado -->
+            <p><strong>Desenvolvedores:</strong><br>- Kaue Ribeiro Costa<br>- Katcilane Silva de Souza</p>
+            <p class="mt-2"><strong>Coordenador:</strong><br>- Patrick Ola Bressan</p>
+            <p class="mt-4">&copy; 2024 AgroIntelliVision - Todos os direitos reservados.</p>
         </footer>
 
     </div>
 
     <!-- =======================
-         Script Principal da Aplicação
-         Responsável por toda a lógica de interação, upload, análise e exibição dos resultados.
+         Script Principal
     ======================== -->
     <script>
-        // ==========================
-        // Referências dos Elementos DOM
-        // ==========================
-        const uploadArea = document.getElementById('upload-area');       // Área de upload de imagem
-        const fileInput = document.getElementById('file-upload');        // Input de arquivo
-        const fileLabel = document.querySelector('.file-input-label');   // Label estilizado para drag-and-drop
-        const resultArea = document.getElementById('result-area');       // Área de resultado da análise
-        const placeholderArea = document.getElementById('placeholder-area'); // Área placeholder
-        const imagePreview = document.getElementById('image-preview');     // Imagem de pré-visualização
-        const loadingSpinner = document.getElementById('loading-spinner');  // Spinner de carregamento
-        const analysisResult = document.getElementById('analysis-result');   // Div com resultado do diagnóstico
-        const predictionText = document.getElementById('prediction-text');   // Texto do diagnóstico
-        const confidenceBar = document.getElementById('confidence-bar');    // Barra de confiança
-        const confidenceText = document.getElementById('confidence-text');   // Texto da confiança
-        const resetButton = document.getElementById('reset-button');       // Botão de reset
+        // --- Referências dos Elementos DOM ---
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-upload');
+        const fileLabel = document.querySelector('.file-input-label');
+        const resultArea = document.getElementById('result-area');
+        const placeholderArea = document.getElementById('placeholder-area');
+        const imagePreview = document.getElementById('image-preview');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const analysisResult = document.getElementById('analysis-result');
+        const predictionText = document.getElementById('prediction-text');
+        const confidenceBar = document.getElementById('confidence-bar');
+        const confidenceText = document.getElementById('confidence-text');
+        const resetButton = document.getElementById('reset-button');
 
-        // ==========================
-        // Listeners de Eventos
-        // ==========================
-
-        // Evento: Seleção de arquivo via clique
+        // --- Listeners de Eventos ---
         fileInput.addEventListener('change', (event) => {
             const files = event.target.files;
             if (files.length > 0) {
                 handleFile(files[0]);
             }
         });
-
-        // Evento: Drag-and-drop sobre o label
         fileLabel.addEventListener('dragover', (event) => {
-            event.preventDefault(); // Previne comportamento padrão do navegador
+            event.preventDefault();
             fileLabel.classList.add('drag-over');
         });
-
-        // Evento: Saída do drag-and-drop
         fileLabel.addEventListener('dragleave', () => {
             fileLabel.classList.remove('drag-over');
         });
-
-        // Evento: Soltar arquivo no label
         fileLabel.addEventListener('drop', (event) => {
             event.preventDefault();
             fileLabel.classList.remove('drag-over');
@@ -209,129 +213,88 @@ A
                 handleFile(files[0]);
             }
         });
-
-        // Evento: Clique no botão de reset para nova análise
         resetButton.addEventListener('click', resetUI);
 
-        // ==========================
-        // Funções Principais
-        // ==========================
-
-        /**
-         * Trata o arquivo selecionado, valida e inicia o processo de predição.
-         * @param {File} file Arquivo de imagem selecionado pelo usuário.
-         */
+        // --- Funções Principais ---
         function handleFile(file) {
-            // Validação básica do tipo de arquivo
             if (!file.type.startsWith('image/')) {
                 alert('Por favor, selecione um arquivo de imagem (JPEG, PNG).');
                 return;
             }
-
-            // Exibe a pré-visualização da imagem
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
             };
             reader.readAsDataURL(file);
-            
-            // Atualiza a interface para o estado de análise
             uploadArea.classList.add('hidden');
             placeholderArea.classList.add('hidden');
             resultArea.classList.remove('hidden');
             analysisResult.classList.add('hidden');
             loadingSpinner.classList.remove('hidden');
-
-            // Envia o arquivo para a API de predição
             predictDisease(file);
         }
 
-        /**
-         * Envia a imagem para o backend (API Flask) para análise.
-         * @param {File} file Arquivo de imagem a ser analisado.
-         */
         async function predictDisease(file) {
             const formData = new FormData();
             formData.append('file', file);
-            
-            // ==========================
-            //  Chamada real para a API Flask
-            // ==========================
             try {
-                // --- Chamada real para a API ---
                 const response = await fetch('http://127.0.0.1:5000/predict', {
                     method: 'POST',
                     body: formData,
                 });
-
                 if (!response.ok) {
                     throw new Error(`Erro na API: ${response.statusText}`);
                 }
-
                 const data = await response.json();
                 displayResults(data);
-
             } catch (error) {
                 console.error("Erro ao processar a imagem:", error);
-                displayError("Não foi possível analisar a imagem. Tente novamente.");
+                displayError("Não foi possível conectar ao servidor de análise. Verifique se ele está em execução.");
             }
         }
 
-        /**
-         * Exibe os resultados da predição na interface.
-         * @param {object} data Objeto retornado pela API.
-         * @param {string} data.prediction Nome da doença predita.
-         * @param {number} data.confidence Score de confiança (0 a 1).
-         */
         function displayResults(data) {
             loadingSpinner.classList.add('hidden');
             analysisResult.classList.remove('hidden');
-
             const confidencePercent = (data.confidence * 100).toFixed(1);
-            
             predictionText.textContent = data.prediction;
             confidenceBar.style.width = `${confidencePercent}%`;
             confidenceText.textContent = `${confidencePercent}%`;
             
-            // Altera cor conforme diagnóstico
-            if(data.prediction === 'Folha Saudável') {
-                predictionText.classList.remove('text-red-700');
-                predictionText.classList.add('text-green-700');
+            if (data.prediction === 'Folha Saudável') {
+                predictionText.classList.remove('text-red-700', 'bg-gray-200');
+                predictionText.classList.add('text-green-800', 'bg-green-200');
                 confidenceBar.classList.remove('bg-red-600');
                 confidenceBar.classList.add('bg-green-600');
             } else {
-                predictionText.classList.remove('text-green-700');
-                predictionText.classList.add('text-red-700');
+                predictionText.classList.remove('text-green-800', 'bg-gray-200');
+                predictionText.classList.add('text-red-700', 'bg-red-200');
                 confidenceBar.classList.remove('bg-green-600');
                 confidenceBar.classList.add('bg-red-600');
             }
         }
         
-        /**
-         * Exibe mensagem de erro na interface.
-         * @param {string} message Mensagem de erro a ser exibida.
-         */
         function displayError(message) {
             loadingSpinner.classList.add('hidden');
             analysisResult.classList.remove('hidden');
             predictionText.textContent = "Erro";
-            predictionText.classList.add('text-red-700');
-            confidenceText.textContent = message;
+            predictionText.classList.add('text-red-700', 'bg-red-200');
             confidenceBar.style.width = '100%';
             confidenceBar.classList.add('bg-red-600');
+            confidenceText.textContent = '';
+            document.getElementById('confidence-bar').parentElement.previousElementSibling.classList.add('hidden'); // Oculta "Confiança:"
         }
 
-        /**
-         * Reseta a interface para o estado inicial, permitindo nova análise.
-         */
         function resetUI() {
             resultArea.classList.add('hidden');
             uploadArea.classList.remove('hidden');
             placeholderArea.classList.remove('hidden');
-            fileInput.value = ''; // Limpa o input de arquivo
+            fileInput.value = '';
             imagePreview.src = '#';
+            document.getElementById('confidence-bar').parentElement.previousElementSibling.classList.remove('hidden');
+            predictionText.classList.remove('text-red-700', 'bg-red-200', 'text-green-800', 'bg-green-200');
+            predictionText.classList.add('text-green-800', 'bg-gray-200');
         }
-
     </script>
 </body>
 </html>
