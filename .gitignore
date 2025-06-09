@@ -7,6 +7,8 @@ __pycache__/
 *.so
 myenv
 
+.venv
+
 
 # Ignorando DataSet
 /data/raw/DataSet
