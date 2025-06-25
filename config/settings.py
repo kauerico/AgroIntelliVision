@@ -4,8 +4,8 @@ import tensorflow as tf
 DATASET_PATH = "data/raw/DataSet"
 BATCH_SIZE = 64
 IMG_SIZE = (256, 256)
-EPOCHS = 20
-NUM_CLASSES = 16
+EPOCHS = 10
+NUM_CLASSES = 8
 
 # Otimizações de performance
 AUTOTUNE = tf.data.AUTOTUNE

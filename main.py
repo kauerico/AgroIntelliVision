@@ -38,10 +38,12 @@ def main():
     
     # Fine-tuning
     model.get_layer('efficientnetv2-b2').trainable = True
+
+    # Compile consistente
     model.compile(
         optimizer=keras.optimizers.Adam(1e-6),
-        loss='sparse_categorical_crossentropy',
-        metrics=model.compiled_metrics.metrics
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
     )
     
     history_fine = model.fit(
