@@ -183,8 +183,17 @@ def main():
     args = parse_args()
     try:
         model = load_model(args.model_path)
-        class_names = os.listdir(args.dataset_dir)  # Lista as classes no diretório
-
+        # Defina explicitamente as 8 classes na ordem correta
+        class_names = [
+            'bean_rust',
+            'crestamento_bacteriano',
+            'ferrugem_asiatica',
+            'mancha_alvo',
+            'mancha_olho_de_ra',
+            'mildio',
+            'oidio',
+            'saudavel'
+        ]
         results = evaluate_model(model, args.dataset_dir, class_names)
         report_path = generate_html_report(results, args.output_dir)
         print(f"Relatório gerado com sucesso em: {report_path}")
